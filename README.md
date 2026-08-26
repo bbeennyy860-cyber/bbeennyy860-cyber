@@ -4,61 +4,35 @@
 
 <p align="center">
   <a href="https://b-davies.dev/">PORTFOLIO</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="https://www.linkedin.com/in/benedict-anokye-davies/">LINKEDIN</a>&nbsp;&nbsp;|&nbsp;&nbsp;
   <a href="mailto:benedictanokyedavies@gmail.com">EMAIL</a>
 </p>
 
-## Current direction
+## Computer Science student building dependable systems
 
-I am a BSc Computer Science with Artificial Intelligence student at the University of Nottingham, graduating in 2028. I build backend systems, deterministic simulations and applied-ML experiments where failures are visible and risky actions have explicit boundaries.
+BSc Computer Science with Artificial Intelligence student at the University of Nottingham, graduating in 2028. I am seeking backend, systems, fintech and applied-AI internships.
 
-- **Seeking:** backend, systems, finance technology and applied-AI internships
-- **Building:** reliable services, simulation environments, evaluation pipelines and governed agent workflows
-- **Learning deliberately:** C++, operating systems, concurrency, algorithms and ML from first principles
-- **Location:** Reading and Nottingham, UK | Authorised to work in the UK
+My work focuses on explicit controls around risky actions, reproducible verification and clear boundaries between prototypes, simulations and live systems.
 
-## Selected engineering work
+## Selected public work
 
-### [SportsQuantX](https://sportsquantx.com/) | commissioned event-market engineering
+### [Arbiter](https://github.com/bbeennyy860-cyber/arbiter) | governed payments prototype
 
-Private-source sports event-market platform deployed on Ubuntu 22.04. I built asynchronous Python and FastAPI services, a PostgreSQL state and reconciliation layer, a Next.js operator dashboard and fail-closed execution controls.
+Co-built for the Nous Research x NVIDIA x Stripe hackathon. Arbiter is an MCP server that reads invoices, applies deterministic payment policy, routes approvals through a governance pipeline and settles only through Stripe test mode.
 
-- Integrates **2 external services:** Kalshi signed REST and orderbook APIs, and ESPN live sports data
-- Current private repository verification: **1,571 passing tests**, **76.9% branch-aware coverage** and **40 PostgreSQL concurrency and upgrade contracts**
-- Source, client operating data and live financial volumes remain private
+My documented contribution covers backend policy, agent core, ledger, governed payment flow, tests and submission work. It is a test-mode prototype, not a real-money payment service.
 
-### [AEOLUS](https://github.com/arm-hackathon/arm-hackathon) | deterministic simulation and applied ML
+### [helios-vps-runner](https://github.com/bbeennyy860-cyber/helios-vps-runner) | remote-operations CLI
 
-Public team project for safety-governed habitat ventilation. My contributions include a deterministic two-room proof loop, validated scenario graphs, multi-zone airflow, compound-fault simulation, actuator feedback, forecast data contracts and model evaluation.
+A Python CLI for allowlisted remote-script execution. It scans content, uses a two-stage apply gate and writes structured, append-only receipts for later review.
 
-- Prepared **23,400 action-conditioned forecast examples** across **60 scenario clusters**
-- Evaluated recovery over **1,008 held-out traces**, measuring **80.396% median harmful-exceedance reduction** with **0 invariant violations**
-- Implemented neural fault candidates and retained deterministic rules when the learned models failed baseline or alert-burden gates
-- Current public repository head passes **1,027 tests**
+### [AEOLUS](https://github.com/arm-hackathon/arm-hackathon) | team simulation project
 
-### [Arbiter](https://github.com/bbeennyy860-cyber/arbiter) | governed AI payments prototype
+A public team project for a space-habitat ventilation system. The repository provides deterministic recovery and evaluation tooling for simulated scenarios, including software safety rules and forecast experiments.
 
-Co-built with Alex Kurkar for the Nous Research x NVIDIA x Stripe hackathon. Deterministic policy runs before bounded model judgement, human escalation and one audited Stripe test-mode settlement path.
+The project is simulation and development work. It is not evidence of physical hardware control or a deployed ventilation system.
 
-- I owned substantial backend policy, agent-core, ledger, payment execution, reconciliation and verification work
-- Reproduced locally at **179 passing tests** and **79% statement coverage**
-- Test mode only, with no real charges, payouts or bank transfers
+## Direction
 
-### [helios-vps-runner](https://github.com/bbeennyy860-cyber/helios-vps-runner) | safe remote operations
+I am building depth in Python, SQL, TypeScript and systems fundamentals, with ongoing study in C++, operating systems, concurrency, algorithms and applied machine learning.
 
-Python CLI for allowlisted remote script execution with content scanning, a two-stage apply gate and structured receipts. Each run produces an append-only record for later review.
-
-## Working with
-
-- **Languages:** Python, SQL, Java, C, TypeScript and Bash
-- **Backend and data:** FastAPI, PostgreSQL, SQLAlchemy, REST APIs, async services and reconciliation
-- **Systems:** Linux, systemd, nginx, Docker, SSH, Git and GitHub Actions
-- **ML and simulation:** NumPy, scikit-learn, temporal classification, leakage-safe splits, baselines, macro-F1 and ONNX Runtime
-- **Agent-assisted engineering:** issue decomposition, parallel agent workflows, code review, test gates and evidence-backed handoffs
-
-## Engineering principles
-
-1. Risky actions need deterministic control boundaries.
-2. A model result is not a system result until it survives held-out evaluation and operational gates.
-3. Tests, receipts and reproducible commands are part of the product.
-4. Private work can be described honestly without exposing client code or operating data.
+Based in Reading and Nottingham, UK. Authorised to work in the UK.
