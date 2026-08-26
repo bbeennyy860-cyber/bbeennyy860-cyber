@@ -29,7 +29,7 @@ A Python CLI for allowlisted remote-script execution. It scans content, uses a t
 
 A public team project for a space-habitat ventilation system. The repository provides deterministic recovery and evaluation tooling for simulated scenarios, including software safety rules and forecast experiments.
 
-The project is simulation and development work. It is not evidence of physical hardware control or a deployed ventilation system.
+The project is simulation and development work. It is not evidence of physical hardware control or a deployed ventilation system. The [AEOLUS companion interface](https://icarus-theta-five.vercel.app/) presents that simulated evidence and keeps the same boundary explicit.
 
 ## Direction
 
