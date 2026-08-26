@@ -8,57 +8,36 @@
   <a href="mailto:benedictanokyedavies@gmail.com">EMAIL</a>
 </p>
 
-## Current direction
+## Computer Science student building dependable systems and applied AI
 
-I am a BSc Computer Science with Artificial Intelligence student at the University of Nottingham, graduating in 2028. I build backend systems, deterministic simulations and applied-ML experiments where failures are visible and risky actions have explicit boundaries.
+I am a BSc Computer Science with Artificial Intelligence student at the University of Nottingham, graduating in 2028. I build backend services, deterministic simulations and governed agent workflows, and I am seeking backend, systems, fintech and applied-AI internships.
 
-- **Seeking:** backend, systems, finance technology and applied-AI internships
-- **Building:** reliable services, simulation environments, evaluation pipelines and governed agent workflows
-- **Learning deliberately:** C++, operating systems, concurrency, algorithms and ML from first principles
-- **Location:** Reading and Nottingham, UK | Authorised to work in the UK
+My direction is systems plus AI: strong backend and operating-systems foundations now, then deeper work in simulation, ML systems and robotics. I care about reproducible verification, visible failure modes and explicit control over risky actions.
 
-## Selected engineering work
+## Selected public work
 
-### [SportsQuantX](https://sportsquantx.com/) | commissioned event-market engineering
+### [Arbiter](https://github.com/bbeennyy860-cyber/arbiter) | governed payments prototype
 
-Private-source sports event-market platform deployed on Ubuntu 22.04. I built asynchronous Python and FastAPI services, a PostgreSQL state and reconciliation layer, a Next.js operator dashboard and fail-closed execution controls.
+Co-built with Alex Kurkar for the Nous Research x NVIDIA x Stripe hackathon. Arbiter reads invoices, applies deterministic payment policy, routes uncertain decisions through bounded model judgement and human escalation, and settles only through Stripe test mode.
 
-- Integrates **2 external services:** Kalshi signed REST and orderbook APIs, and ESPN live sports data
-- Current private repository verification: **1,571 passing tests**, **76.9% branch-aware coverage** and **40 PostgreSQL concurrency and upgrade contracts**
-- Source, client operating data and live financial volumes remain private
+My documented contribution includes backend policy, the agent core, ledger, governed payment execution, reconciliation and verification. It is a prototype, not a real-money payment service.
 
-### [AEOLUS](https://github.com/arm-hackathon/arm-hackathon) | deterministic simulation and applied ML
+### [helios-vps-runner](https://github.com/bbeennyy860-cyber/helios-vps-runner) | safety-gated remote operations
 
-Public team project for safety-governed habitat ventilation. My contributions include a deterministic two-room proof loop, validated scenario graphs, multi-zone airflow, compound-fault simulation, actuator feedback, forecast data contracts and model evaluation.
+A Python CLI for running allowlisted operational scripts on SSH hosts. It scans script content, separates inspection from application and writes structured local receipts for later review.
 
-- Prepared **23,400 action-conditioned forecast examples** across **60 scenario clusters**
-- Evaluated recovery over **1,008 held-out traces**, measuring **80.396% median harmful-exceedance reduction** with **0 invariant violations**
-- Implemented neural fault candidates and retained deterministic rules when the learned models failed baseline or alert-burden gates
-- Current public repository head passes **1,027 tests**
+The scanner is a safety gate, not a sandbox. SSH permissions, secrets and remote account authority remain external controls.
 
-### [Arbiter](https://github.com/bbeennyy860-cyber/arbiter) | governed AI payments prototype
+### [AEOLUS](https://github.com/arm-hackathon/arm-hackathon) | team habitat-simulation project
 
-Co-built with Alex Kurkar for the Nous Research x NVIDIA x Stripe hackathon. Deterministic policy runs before bounded model judgement, human escalation and one audited Stripe test-mode settlement path.
+A public team project exploring space-habitat ventilation through deterministic simulation, recovery-policy evaluation and advisory forecasting. My public contributions span simulation and scenario contracts, recovery evidence and model-evaluation tooling.
 
-- I owned substantial backend policy, agent-core, ledger, payment execution, reconciliation and verification work
-- Reproduced locally at **179 passing tests** and **79% statement coverage**
-- Test mode only, with no real charges, payouts or bank transfers
+Deterministic software retains actuator authority while learned forecasts remain advisory. This is simulation and development evidence, not physical spacecraft control or a deployed life-support system. The [AEOLUS companion interface](https://icarus-theta-five.vercel.app/) provides the visual topology workspace.
 
-### [helios-vps-runner](https://github.com/bbeennyy860-cyber/helios-vps-runner) | safe remote operations
+## Current foundation
 
-Python CLI for allowlisted remote script execution with content scanning, a two-stage apply gate and structured receipts. Each run produces an append-only record for later review.
+- **Languages:** Python, SQL, TypeScript and C. Building C++ and Java foundations.
+- **Backend and systems:** FastAPI, PostgreSQL, Linux, SSH, Docker, Git and GitHub Actions
+- **Learning now:** algorithms and data structures, operating systems, concurrency, C++ and machine learning from first principles
 
-## Working with
-
-- **Languages:** Python, SQL, Java, C, TypeScript and Bash
-- **Backend and data:** FastAPI, PostgreSQL, SQLAlchemy, REST APIs, async services and reconciliation
-- **Systems:** Linux, systemd, nginx, Docker, SSH, Git and GitHub Actions
-- **ML and simulation:** NumPy, scikit-learn, temporal classification, leakage-safe splits, baselines, macro-F1 and ONNX Runtime
-- **Agent-assisted engineering:** issue decomposition, parallel agent workflows, code review, test gates and evidence-backed handoffs
-
-## Engineering principles
-
-1. Risky actions need deterministic control boundaries.
-2. A model result is not a system result until it survives held-out evaluation and operational gates.
-3. Tests, receipts and reproducible commands are part of the product.
-4. Private work can be described honestly without exposing client code or operating data.
+Based in Reading and Nottingham, UK. Authorised to work in the UK.
