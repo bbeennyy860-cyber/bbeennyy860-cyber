@@ -1,0 +1,101 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AEOLUS | Fault replay</title><style>
+*{box-sizing:border-box}body{margin:0;background:#0c1621;color:#eef4f5;font:16px system-ui,sans-serif}main{max-width:950px;margin:auto;padding:36px 28px}header{display:flex;align-items:baseline;gap:18px;border-bottom:1px solid #374955;padding-bottom:19px}h1{margin:0;font-size:38px;letter-spacing:-2px}h2{font-size:25px;margin:26px 0 4px}p{color:#b8c9d0;line-height:1.5}.ctrl{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:22px 0}label{display:grid;gap:6px;color:#c5d6dc;font-size:13px}select,input,button{background:#172735;color:#f1f6f8;border:1px solid #526674;border-radius:6px;padding:9px;font:inherit}button{cursor:pointer}input[type=number]{width:105px}button.primary{color:#0a221f;background:#7ce7c8;border-color:#7ce7c8}section{background:#122230;border:1px solid #344b59;border-radius:10px;padding:18px}.stats{display:flex;gap:20px;flex-wrap:wrap;color:#bbccd1;font-size:14px}.stats b{font:600 20px ui-monospace,monospace;color:#fff;display:block}svg{width:100%;height:auto}.legend{font-size:14px}.actual{color:#78e7c9}.sensor{color:#f6c586}.timeline{display:flex;align-items:center;gap:12px;margin-top:12px}.timeline input{flex:1;min-width:60px;accent-color:#78e7c9}small{color:#a2b7bf}a{color:#8ce7d5}
+</style><main><header><h1>AEOLUS</h1><span>Habitat simulation / fault replay</span></header>
+<h2>Compare airflow scenarios</h2><p>Run two fixtures with the same seed. Both charts share a clock and an airflow scale.</p>
+<form class="ctrl" id="controls"><label>Baseline<select id="left"></select></label><label>Comparison<select id="right"></select></label><label>Shared seed<input type="number" id="seed" min="0" max="4294967295" step="1" required value="7"></label><button class="primary">Run comparison</button></form>
+<section><div id="chart"></div><div class="timeline"><button id="play">Replay</button><input id="scrub" aria-label="Shared replay tick" type="range" min="0" max="71" value="71"><output id="position"></output></div></section>
+<div class="ctrl"><button id="save">Export paired trace</button><small>One row per paired tick · JSONL</small></div><small>Deterministic browser fixture · <a href="https://github.com/arm-hackathon/arm-hackathon/tree/main/demo/browser-simulator">Source and tests</a></small></main><script type="module">
+export const SCENARIOS = Object.freeze([
+  { id: 'nominal', label: 'Nominal circulation', description: 'Baseline airflow with bounded ambient variation.' },
+  { id: 'fan-degradation', label: 'Fan degradation', description: 'A fixed efficiency decline reduces supplied airflow.' },
+  { id: 'blocked-path', label: 'Blocked path', description: 'A fixed duct restriction raises the airflow residual.' },
+  { id: 'frozen-sensor', label: 'Frozen sensor', description: 'The reported airflow is held after its fixed fault point.' },
+]);
+const FIXTURES = Object.freeze({ nominal: [1, 0], 'fan-degradation': [.62, 0], 'blocked-path': [1, .48], 'frozen-sensor': [1, 0, 8] });
+const round = (value) => Number(value.toFixed(4));
+function rng(seed) { let state = (seed >>> 0) || 1; return () => { state ^= state << 13; state ^= state >>> 17; state ^= state << 5; return (state >>> 0) / 4294967296; }; }
+export function traceToJsonl(result) { return `${result.trace.map((row) => JSON.stringify(row)).join('\n')}\n`; }
+export async function sha256(value) {
+  const bytes = new TextEncoder().encode(value);
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+export async function runSimulation({ scenarioId, seed, ticks = 72 }) {
+  if (!Object.hasOwn(FIXTURES, scenarioId)) throw new Error('Unknown closed-schema scenario.');
+  if (!Number.isInteger(seed) || seed < 0 || seed > 4294967295) throw new Error('Seed must be an unsigned 32-bit integer.');
+  if (!Number.isInteger(ticks) || ticks < 1 || ticks > 360) throw new Error('Ticks must be an integer between 1 and 360.');
+  const [fanEfficiency, pathRestriction, freezeSensorAt] = FIXTURES[scenarioId];
+  const random = rng(seed); const trace = []; let previousReportedAirflow;
+  for (let tick = 0; tick < ticks; tick += 1) {
+    const ambientVariation = (random() - .5) * .3;
+    const targetAirflow = 8.8 + Math.sin((tick + (seed % 17)) / 5) * .55;
+    const airflow = Math.max(.1, targetAirflow * fanEfficiency * (1 - pathRestriction) + ambientVariation);
+    const reportedAirflow = freezeSensorAt !== undefined && tick >= freezeSensorAt ? previousReportedAirflow : airflow;
+    previousReportedAirflow = reportedAirflow;
+    trace.push({ tick, scenarioId, temperatureC: round(21.2 + (targetAirflow - airflow) * .36 + Math.cos(tick / 8) * .18), airflow: round(airflow), residual: round(Math.abs(targetAirflow - airflow)), reportedAirflow: round(reportedAirflow), actionAuthority: 'none' });
+  }
+  return { scenarioId, seed, ticks, trace, digest: await sha256(trace.map((row) => JSON.stringify(row)).join('\n')) };
+}
+
+const names = Object.fromEntries(SCENARIOS.map(s => [s.id, s.label]));
+function compareFrame(runs, seed, tick) {
+  const values = runs.flatMap(run => run.trace.flatMap(r => [r.airflow, r.reportedAirflow]));
+  const min = Math.floor(Math.min(...values)), max = Math.ceil(Math.max(...values));
+  const y = v => 178 - 96 * (v - min) / (max - min);
+  const delta = runs[1].trace[tick].airflow - runs[0].trace[tick].airflow;
+  const text = (x,y,value,size=14,color='#c4d4dc') => '<text x="'+x+'" y="'+y+'" font-size="'+size+'" fill="'+color+'">'+value+'</text>';
+  const panels = runs.map((run,k) => {
+    const x0 = 40 + k*303, current = run.trace[tick];
+    const grid = [min,(min+max)/2,max].map(v =>
+      '<path d="M'+x0+' '+y(v)+'h245" stroke="#415462"/>'+text(x0-25,y(v)+4,v,12)).join('');
+    const curves = [['airflow','#77e4ca',''],['reportedAirflow','#ffc585','5 5']].map(([key,color,dash]) => {
+      const points = run.trace.slice(0,tick+1).map((r,j) => (x0+j*245/71).toFixed(1)+','+y(r[key]).toFixed(1)).join(' ');
+      return '<polyline points="'+points+'" stroke="'+color+'" stroke-width="2.5" stroke-dasharray="'+dash+'" fill="none"/>';
+    }).join('');
+    return text(x0-18,29,names[run.scenarioId],19,'#fff')+text(x0-18,56,current.airflow.toFixed(2)+' a.u.',20,'#77e4ca')+text(x0+92,54,current.temperatureC.toFixed(1)+' °C',13)+grid+curves+text(x0,197,'0',12)+text(x0+230,197,'71',12);
+  }).join('');
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 606 278" role="img" aria-label="Airflow comparison at tick '+tick+'"><rect width="606" height="278" fill="#122230"/><g font-family="DejaVu Sans, sans-serif">'+panels+text(18,224,'Airflow',14,'#77e4ca')+text(89,224,'Dashed: sensor reading',14,'#ffc585')+text(18,255,'Seed '+seed+'   /   Tick '+tick+'   /   Comparison − baseline: '+(delta>0?'+':'')+delta.toFixed(2)+' a.u.',15,'#fff')+'</g></svg>';
+}
+const el = id => document.getElementById(id);
+for (const side of ['left','right']) {
+  for (const s of SCENARIOS) el(side).add(new Option(s.label,s.id));
+}
+el('left').value='nominal';
+el('right').value='fan-degradation';
+let runs, seedUsed, timer, generation=0;
+function draw() {
+  const tick=Number(el('scrub').value);
+  el('chart').innerHTML=compareFrame(runs,seedUsed,tick);
+  el('position').textContent=tick+' / 71';
+}
+function stop() {
+  clearInterval(timer); timer=null; el('play').textContent='Replay';
+}
+function toggle() {
+  if (timer) { stop(); return; }
+  if (Number(el('scrub').value)===71) el('scrub').value=0;
+  draw(); el('play').textContent='Pause';
+  timer=setInterval(()=>{
+    el('scrub').value=Number(el('scrub').value)+1;
+    draw(); if(Number(el('scrub').value)===71) stop();
+  },135);
+}
+async function run(animate) {
+  stop();
+  const id=++generation, seed=Number(el('seed').value);
+  const pair=await Promise.all(['left','right'].map(side=>runSimulation({scenarioId:el(side).value,seed})));
+  if(id!==generation) return;
+  runs=pair; seedUsed=seed; el('scrub').value=animate?0:71; draw();
+  if(animate) toggle();
+}
+el('controls').onsubmit=e=>{e.preventDefault();run(true)};
+el('play').onclick=toggle;
+el('scrub').oninput=()=>{stop();draw()};
+el('save').onclick=()=>{
+  const rows=runs[0].trace.map((baseline,i)=>JSON.stringify({seed:seedUsed,tick:i,baseline,comparison:runs[1].trace[i]}));
+  const url=URL.createObjectURL(new Blob([rows.join('\n')+'\n'],{type:'application/x-ndjson'}));
+  const a=document.createElement('a');a.href=url;a.download='aeolus-'+runs.map(r=>r.scenarioId).join('-vs-')+'-'+seedUsed+'.jsonl';
+  a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+await run(false);
+</script></html>
