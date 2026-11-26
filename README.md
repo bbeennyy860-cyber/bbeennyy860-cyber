@@ -6,13 +6,18 @@ I build software that helps people decide what happened and what to do next. Tha
 
 [Portfolio](https://b-davies.dev/) · [LinkedIn](https://www.linkedin.com/in/benedict-anokye-davies/)
 
-### [AEOLUS](https://github.com/arm-hackathon/arm-hackathon) · How much airflow does a degraded fan lose?
+### [AEOLUS](https://github.com/arm-hackathon/arm-hackathon) · Can a model forecast the air in a habitat?
 
-[![Side-by-side replay of nominal circulation and a degraded fan. Using the same seed, airflow at tick 71 is 8.78 versus 5.41 arbitrary units.](assets/aeolus-comparison.gif)](https://github.com/arm-hackathon/arm-hackathon/tree/main/demo/browser-simulator)
+<p>
+  <a href="docs/aeolus/README.md#forecast"><img src="assets/aeolus-forecast.png" width="350" alt="Occupied mode: the model forecasts 954 ppm of lab CO₂ at minute 24; the simulator reaches 981 ppm. Holding the last reading would give 1,207 ppm." /></a>
+  <a href="docs/aeolus/README.md#fan-replay"><img src="assets/aeolus-airflow.gif" width="350" alt="Separate 3D replay: at 360 seconds the same fan command delivers 71.8 L/s to the lab normally and 53.9 L/s with a degraded fan, a difference of −17.9 L/s." /></a>
+</p>
 
-I worked on simulation scenarios, recovery evidence and forecast evaluation for this team project. This deterministic browser fixture compares two scenarios with the same seed, clock and airflow scale. At tick 71, fan degradation reduces simulated airflow by **3.37 arbitrary units** for seed 7.
+Give the neural network the last 16 minutes of simulated sensor readings and it forecasts the next eight for four possible commands. In occupied mode it predicts **954 ppm** of laboratory CO₂; the simulator reaches **981 ppm**. In dormant mode, keeping the last reading beats the model. In a separate 3D replay, the degraded fan delivers **17.9 L/s less** to the lab at 360 seconds on the same command.
 
-[Download the offline comparison GUI](https://raw.githubusercontent.com/bbeennyy860-cyber/bbeennyy860-cyber/main/demos/aeolus-fault-replay.html) · [Run the guided tour](https://github.com/arm-hackathon/arm-hackathon#start-here)
+I worked on simulation scenarios, recovery evidence and forecast evaluation for this team project. The model advises; a deterministic controller decides which command the simulator applies.
+
+[Download the offline demo](https://github.com/bbeennyy860-cyber/bbeennyy860-cyber/raw/96dcb4d0018b62667ff2655582a5ac0273714637/demos/aeolus-habitat-preview.zip) · [Explore both experiments](docs/aeolus/README.md) · [Run the model yourself](docs/aeolus/README.md#reproduce)
 
 ### [PolicyCanary](https://github.com/bbeennyy860-cyber/policycanary) · When has a robot policy earned a rollout?
 
