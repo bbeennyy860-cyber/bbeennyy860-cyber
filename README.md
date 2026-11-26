@@ -13,7 +13,7 @@ I build software that helps people decide what happened and what to do next. Tha
   <a href="docs/aeolus/README.md#fan-replay"><img src="assets/aeolus-airflow.gif" width="350" alt="Separate 3D replay: at 360 seconds the same fan command delivers 71.8 L/s to the lab normally and 53.9 L/s with a degraded fan, a difference of −17.9 L/s." /></a>
 </p>
 
-Give the neural network the last 16 minutes of simulated sensor readings and it forecasts the next eight for four possible commands. In occupied mode it predicts **954 ppm** of laboratory CO₂; the simulator reaches **981 ppm**. In dormant mode, keeping the last reading beats the model. A separate 3D replay shows what happens when the fan receives the same command but delivers less air.
+Give the neural network the last 16 minutes of simulated sensor readings and it forecasts the next eight for four possible commands. In occupied mode it predicts **954 ppm** of laboratory CO₂; the simulator reaches **981 ppm**. In dormant mode, keeping the last reading beats the model. In a separate 3D replay, the degraded fan delivers **17.9 L/s less** to the lab at 360 seconds on the same command.
 
 I worked on simulation scenarios, recovery evidence and forecast evaluation for this team project. The model advises; a deterministic controller decides which command the simulator applies.
 
