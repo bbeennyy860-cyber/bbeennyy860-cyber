@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AEOLUS | Fault replay</title><style>
+*{box-sizing:border-box}body{margin:0;background:#0c1621;color:#eef4f5;font:16px system-ui,sans-serif}main{max-width:950px;margin:auto;padding:36px 28px}header{display:flex;align-items:baseline;gap:18px;border-bottom:1px solid #374955;padding-bottom:19px}h1{margin:0;font-size:38px;letter-spacing:-2px}h2{font-size:25px;margin:26px 0 4px}p{color:#b8c9d0;line-height:1.5}.ctrl{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:22px 0}label{display:grid;gap:6px;color:#c5d6dc;font-size:13px}select,input,button{background:#172735;color:#f1f6f8;border:1px solid #526674;border-radius:6px;padding:9px;font:inherit}button{cursor:pointer}input[type=number]{width:105px}button.primary{color:#0a221f;background:#7ce7c8;border-color:#7ce7c8}section{background:#122230;border:1px solid #344b59;border-radius:10px;padding:18px}.stats{display:flex;gap:20px;flex-wrap:wrap;color:#bbccd1;font-size:14px}.stats b{font:600 20px ui-monospace,monospace;color:#fff;display:block}svg{width:100%;height:auto}.legend{font-size:14px}.actual{color:#78e7c9}.sensor{color:#f6c586}.timeline{display:flex;align-items:center;gap:12px;margin-top:12px}.timeline input{flex:1;min-width:60px;accent-color:#78e7c9}small{color:#a2b7bf}a{color:#8ce7d5}
+</style><main><header><h1>AEOLUS</h1><span>Habitat simulation / fault replay</span></header><h2>Inspect a sensor fault</h2><p>Replay a deterministic fixture and compare the airflow in the simulation with the reading a controller would receive.</p><div class="ctrl"><label>Scenario<select id="scenario"></select></label><label>Seed<input type="number" id="seed" min="0" max="4294967295" value="7" required></label><button id="run" class="primary">Run replay</button><button id="save">Export trace</button></div><section><div class="stats"><span>Tick<b id="tick"></b></span><span>Simulated airflow<b id="flow"></b></span><span>Sensor reading<b id="seen"></b></span><span>Temperature<b id="temp"></b></span></div><svg viewBox="0 0 820 218" role="img" aria-label="Simulated and reported airflow over time"><g id="plot"></g></svg><div class="legend"><span class="actual">━ Simulated airflow</span> &nbsp; <span class="sensor">┄ Sensor reading</span> · arbitrary units</div><div class="timeline"><button id="play">Play</button><input id="scrub" aria-label="Replay tick" type="range" min="0" max="71" value="71"></div></section><p id="note"></p><small>Browser fixture · 72 ticks · <a href="https://github.com/arm-hackathon/arm-hackathon/tree/main/demo/browser-simulator">Source and tests</a></small></main><script type="module">
+export const SCENARIOS = Object.freeze([
+  { id: 'nominal', label: 'Nominal circulation', description: 'Baseline airflow with bounded ambient variation.' },
+  { id: 'fan-degradation', label: 'Fan degradation', description: 'A fixed efficiency decline reduces supplied airflow.' },
+  { id: 'blocked-path', label: 'Blocked path', description: 'A fixed duct restriction raises the airflow residual.' },
+  { id: 'frozen-sensor', label: 'Frozen sensor', description: 'The reported airflow is held after its fixed fault point.' },
+]);
+const FIXTURES = Object.freeze({ nominal: [1, 0], 'fan-degradation': [.62, 0], 'blocked-path': [1, .48], 'frozen-sensor': [1, 0, 8] });
+const round = (value) => Number(value.toFixed(4));
+function rng(seed) { let state = (seed >>> 0) || 1; return () => { state ^= state << 13; state ^= state >>> 17; state ^= state << 5; return (state >>> 0) / 4294967296; }; }
+export function traceToJsonl(result) { return `${result.trace.map((row) => JSON.stringify(row)).join('\n')}\n`; }
+export async function sha256(value) {
+  const bytes = new TextEncoder().encode(value);
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+export async function runSimulation({ scenarioId, seed, ticks = 72 }) {
+  if (!Object.hasOwn(FIXTURES, scenarioId)) throw new Error('Unknown closed-schema scenario.');
+  if (!Number.isInteger(seed) || seed < 0 || seed > 4294967295) throw new Error('Seed must be an unsigned 32-bit integer.');
+  if (!Number.isInteger(ticks) || ticks < 1 || ticks > 360) throw new Error('Ticks must be an integer between 1 and 360.');
+  const [fanEfficiency, pathRestriction, freezeSensorAt] = FIXTURES[scenarioId];
+  const random = rng(seed); const trace = []; let previousReportedAirflow;
+  for (let tick = 0; tick < ticks; tick += 1) {
+    const ambientVariation = (random() - .5) * .3;
+    const targetAirflow = 8.8 + Math.sin((tick + (seed % 17)) / 5) * .55;
+    const airflow = Math.max(.1, targetAirflow * fanEfficiency * (1 - pathRestriction) + ambientVariation);
+    const reportedAirflow = freezeSensorAt !== undefined && tick >= freezeSensorAt ? previousReportedAirflow : airflow;
+    previousReportedAirflow = reportedAirflow;
+    trace.push({ tick, scenarioId, temperatureC: round(21.2 + (targetAirflow - airflow) * .36 + Math.cos(tick / 8) * .18), airflow: round(airflow), residual: round(Math.abs(targetAirflow - airflow)), reportedAirflow: round(reportedAirflow), actionAuthority: 'none' });
+  }
+  return { scenarioId, seed, ticks, trace, digest: await sha256(trace.map((row) => JSON.stringify(row)).join('\n')) };
+}
+
+const el=id=>document.getElementById(id);
+let trace=[],timer=null,runId=0,currentScenario,currentSeed;
+for(const sc of SCENARIOS)el('scenario').add(new Option(sc.label,sc.id));
+el('scenario').value='frozen-sensor';
+function pause(){clearInterval(timer);timer=null;el('play').textContent='Play'}
+function draw(){let i=+el('scrub').value,r=trace[i];if(!r)return;el('tick').textContent=i+' / 71';el('flow').textContent=r.airflow.toFixed(2);el('seen').textContent=r.reportedAirflow.toFixed(2);el('temp').textContent=r.temperatureC.toFixed(1)+' °C';const vals=trace.flatMap(r=>[r.airflow,r.reportedAirflow]);let lo=Math.floor(Math.min(...vals)*2)/2,hi=Math.ceil(Math.max(...vals)*2)/2;const y=v=>178-(v-lo)/(hi-lo)*144,x=j=>54+j*10.4;let svg='';for(let k=0;k<=2;k++){let v=lo+(hi-lo)*k/2;svg+='<path stroke="#344b59" d="M54 '+y(v)+'h740"/><text x="5" y="'+(y(v)+4)+'" fill="#a9bec7" font-size="13">'+v.toFixed(1)+'</text>'}for(let [key,color,dash] of [['airflow','#78e7c9',''],['reportedAirflow','#f6c586','7 5']]){let points=trace.slice(0,i+1).map((r,j)=>x(j)+','+y(r[key])).join(' ');svg+='<polyline fill="none" stroke="'+color+'" stroke-width="3" stroke-dasharray="'+dash+'" points="'+points+'"/>'}svg+='<text x="54" y="206" fill="#a9bec7">Tick 0</text><text x="745" y="206" fill="#a9bec7">Tick 71</text>';el('plot').innerHTML=svg;el('note').textContent=currentScenario==='frozen-sensor'?(i>=8?'From tick 8 the sensor repeats its last reading. The simulated airflow continues to change.':'Before tick 8 the sensor follows simulated airflow.') : SCENARIOS.find(s=>s.id===currentScenario).description}
+function play(){if(timer){pause();return}if(+el('scrub').value===71)el('scrub').value=0;draw();el('play').textContent='Pause';timer=setInterval(()=>{el('scrub').value=+el('scrub').value+1;draw();if(+el('scrub').value>=71)pause()},135)}
+async function run(animate){if(!el('seed').reportValidity())return;pause();let id=++runId,s=el('scenario').value,seed=Number(el('seed').value);let result=await runSimulation({scenarioId:s,seed});if(id!==runId)return;trace=result.trace;currentScenario=s;currentSeed=seed;el('scrub').value=animate?0:71;draw();if(animate)play()}
+el('run').onclick=()=>run(true);el('play').onclick=play;el('scrub').oninput=()=>{pause();draw()};el('save').onclick=()=>{let a=document.createElement('a');let url=URL.createObjectURL(new Blob([traceToJsonl({trace})],{type:'application/x-ndjson'}));a.href=url;a.download='aeolus-'+currentScenario+'-'+currentSeed+'.jsonl';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};await run(false);
+</script></html>
