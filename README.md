@@ -1,29 +1,22 @@
-# Benedict Anokye-Davies
+<h1 align="center">Benedict Anokye-Davies</h1>
+<p align="center">Computer Science with AI at Nottingham · Systems, simulation and robotics<br/>Summer 2027 engineering internships · Graduating June 2028</p>
+<p align="center"><a href="https://b-davies.dev/">Portfolio</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/benedict-anokye-davies/">LinkedIn</a></p>
 
-Computer Science with AI at Nottingham · Graduating June 2028 · Seeking summer 2027 internships in systems, backend engineering and applied AI.
+## Selected work
 
-I build software that helps people decide what happened and what to do next. That has meant recovering interrupted orders for a client, replaying faults in a habitat simulation and testing whether a robot policy has earned a rollout.
-
-[Portfolio](https://b-davies.dev/) · [LinkedIn](https://www.linkedin.com/in/benedict-anokye-davies/)
-
-### [PolicyCanary](https://github.com/bbeennyy860-cyber/policycanary) · When has a robot policy earned a rollout?
-
-I built a release gate that updates after each paired trial. I tested it on sign-flipped data where the two policies were equally effective by construction. Across 29 policy pairs, repeated fixed-sample testing produced a false promotion in 29.2% of runs. The sequential gate did so in 0.94%.
-
-[![False-promotion calibration across 29 policy pairs](assets/policycanary-calibration.svg)](https://github.com/bbeennyy860-cyber/policycanary/blob/main/docs/CALIBRATION.md)
-
-[Read the experiment](https://github.com/bbeennyy860-cyber/policycanary/blob/main/docs/CALIBRATION.md) · TypeScript, PostgreSQL, Python
-
-### [AEOLUS](https://github.com/arm-hackathon/arm-hackathon) · What can a controller learn from a faulty sensor?
-
-On this team project I worked on simulation scenarios, recovery evidence and forecast evaluation. In an early held-out experiment, a simple rule detected ventilation faults more reliably than our learned detector. The current simulator lets you replay an intervention in an eight-zone habitat and inspect what the controller observed.
-
-[Run the guided tour](https://github.com/arm-hackathon/arm-hackathon#start-here) · Python, NumPy, PyTorch
+<table><tr>
+<td width="50%" valign="top"><a href="https://github.com/arm-hackathon/arm-hackathon"><img src="assets/aeolus-frozen-sensor.svg" width="100%" alt="Simulated airflow continues changing while the sensor reading stays flat from tick eight."/></a><br/>
+<b><a href="https://github.com/arm-hackathon/arm-hackathon">AEOLUS</a> · Habitat simulation</b><p>On this team project I worked on fault scenarios, recovery evidence and forecast evaluation. This trace comes from the browser fixture, seed 7. The sensor freezes at tick 8 while the simulated airflow keeps changing.</p>
+<a href="https://github.com/arm-hackathon/arm-hackathon/tree/main/demo/browser-simulator">Reproduce the trace</a> · <code>Python</code> <code>NumPy</code></td>
+<td width="50%" valign="top"><a href="https://github.com/bbeennyy860-cyber/policycanary/blob/main/docs/CALIBRATION.md"><img src="assets/policycanary-calibration.svg" width="100%" alt="False promotions under the null: repeated tests 29.2%, sequential gate 0.94%."/></a><br/>
+<b><a href="https://github.com/bbeennyy860-cyber/policycanary">PolicyCanary</a> · Robot policy evaluation</b><p>I built a gate that decides when a new policy has earned a rollout. Across 29 sign-flipped policy pairs, repeated testing falsely promoted a candidate in 29.2% of runs. The sequential gate did so in 0.94%.</p>
+<a href="https://github.com/bbeennyy860-cyber/policycanary/blob/main/docs/CALIBRATION.md">Inspect the calibration</a> · <code>TypeScript</code> <code>PostgreSQL</code></td>
+</tr></table>
 
 ### [Arbiter](https://github.com/bbeennyy860-cyber/arbiter) · Which invoices can an agent settle?
 
-Alex Kurkar and I built this prototype for the Nous Research × NVIDIA × Stripe hackathon. I worked on the backend policy engine, agent core and ledger. Deterministic checks catch duplicate invoices and changed payee details before an approved payment reaches Stripe test mode.
+Alex Kurkar and I built this prototype for the Nous Research × NVIDIA × Stripe hackathon. I worked on the backend policy engine, agent core and ledger. Deterministic checks catch duplicate invoices and changed payee details before an approved payment reaches Stripe test mode. [Trace an invoice through the system →](https://github.com/bbeennyy860-cyber/arbiter#example-demo-scenario)
 
-[Follow a demo invoice](https://github.com/bbeennyy860-cyber/arbiter#example-demo-scenario) · Python, Stripe test mode
+### Vigil CubeSat · Current engineering work
 
-I’m also working on C++ command and telemetry interfaces for Nottingham’s Vigil CubeSat team and studying VHDL for FPGA development.
+I’m developing C++ on-board data handling with Nottingham’s student satellite team, defining how ground commands and telemetry cross subsystem boundaries. I’m studying VHDL for the team’s proposed FPGA implementation.
